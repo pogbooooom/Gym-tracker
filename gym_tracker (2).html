@@ -1,0 +1,2875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>My Gym Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 40px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+            padding: 10px;
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 6vw, 32px);
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: clamp(14px, 3.5vw, 16px);
+            opacity: 0.9;
+        }
+
+        .day-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .day-btn {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 18px 12px;
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: bold;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .day-btn small {
+            font-size: clamp(11px, 2.5vw, 13px);
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        .day-btn:active {
+            transform: scale(0.95);
+        }
+
+        .day-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .workout-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .workout-title {
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: bold;
+            color: #999;
+            text-transform: uppercase;
+            margin: 20px 0 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .exercise {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .exercise-name {
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .exercise-details {
+            font-size: clamp(13px, 3vw, 14px);
+            color: #666;
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .exercise-details strong {
+            color: #667eea;
+        }
+
+        .form-tip {
+            font-size: clamp(12px, 2.8vw, 13px);
+            color: #888;
+            font-style: italic;
+            margin-top: 8px;
+            padding-left: 10px;
+            border-left: 2px solid #ddd;
+            line-height: 1.4;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-container label {
+            font-size: clamp(14px, 3.5vw, 16px);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: clamp(13px, 3vw, 14px);
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #1976d2;
+        }
+
+        .progress-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            min-height: 48px;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.98);
+        }
+
+        .rest-day {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+
+        .rest-day h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: clamp(20px, 5vw, 24px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .timer {
+            background: #4caf50;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            font-size: clamp(28px, 7vw, 32px);
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .timer-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .timer-btn {
+            padding: 12px 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(13px, 3vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            background: white;
+            color: #4caf50;
+            min-height: 44px;
+        }
+
+        .timer-btn:active {
+            transform: scale(0.95);
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: clamp(13px, 3vw, 14px);
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .demo-btn:active {
+            transform: scale(0.98);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: sticky;
+            top: 0;
+            right: 0;
+            float: right;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 10;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
+        .demo-title {
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+            clear: both;
+        }
+
+        .demo-canvas {
+            width: 100%;
+            height: 250px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #exerciseCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+        }
+
+        .muscle-diagram {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .muscle-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: clamp(12px, 2.8vw, 13px);
+            font-weight: bold;
+            border: 2px solid #1976d2;
+        }
+
+        .muscle-tag.primary {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .form-steps {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .form-steps h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: clamp(15px, 3.5vw, 17px);
+        }
+
+        .form-steps ol {
+            margin-left: 20px;
+        }
+
+        .form-steps li {
+            margin: 8px 0;
+            color: #333;
+            font-size: clamp(13px, 3vw, 14px);
+            line-height: 1.5;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .anim-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            font-size: clamp(13px, 3vw, 14px);
+            min-height: 44px;
+        }
+
+        .anim-btn:active {
+            transform: scale(0.95);
+        }
+
+        .common-mistakes {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .common-mistakes h4 {
+            color: #c62828;
+            margin-bottom: 10px;
+            font-size: clamp(15px, 3.5vw, 17px);
+        }
+
+        .common-mistakes ul {
+            margin-left: 20px;
+        }
+
+        .common-mistakes li {
+            margin: 5px 0;
+            color: #555;
+            font-size: clamp(13px, 3vw, 14px);
+            line-height: 1.5;
+        }
+
+        /* Improve touch targets on iOS */
+        @media (max-width: 768px) {
+            .day-btn, .demo-btn, .timer-btn, .anim-btn, .reset-btn, .close-btn {
+                min-height: 44px;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+            }
+            
+            .workout-card {
+                padding: 18px 15px;
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .header h1 {
+                font-size: 24px;
+                margin-bottom: 5px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .day-btn {
+                padding: 12px 10px;
+                min-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 My Gym Program</h1>
+            <p>4-Day Full Body Beginner Plan</p>
+        </div>
+
+        <div class="day-selector">
+            <button class="day-btn active" onclick="showDay('day1')">Day 1<br><small>Upper Body A</small></button>
+            <button class="day-btn" onclick="showDay('day2')">Day 2<br><small>Lower Body A</small></button>
+            <button class="day-btn" onclick="showDay('day3')">Day 3<br><small>Upper Body B</small></button>
+            <button class="day-btn" onclick="showDay('day4')">Day 4<br><small>Lower Body B</small></button>
+        </div>
+
+        <!-- DAY 1: Upper Body A -->
+        <div id="day1" class="workout-content">
+            <div class="workout-card">
+                <div class="workout-title">Day 1: Upper Body A</div>
+                
+                <div class="info-box">
+                    <strong>⏱️ Duration:</strong> 45-60 minutes<br>
+                    <strong>🎯 Focus:</strong> Chest, Back, Shoulders
+                </div>
+
+                <div class="section-title">Warm-up (5-10 min)</div>
+                <div class="exercise">
+                    <div class="exercise-name">Light Cardio + Arm Circles</div>
+                    <div class="exercise-details">5 minutes treadmill/bike + arm mobility</div>
+                </div>
+
+                <div class="section-title">Main Workout</div>
+                
+                <div class="exercise">
+                    <div class="exercise-name">1. Bench Press (Barbell or Dumbbell)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 8-10 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Keep feet flat, arch lower back slightly, bar touches mid-chest</div>
+                    <button class="demo-btn" onclick="showDemo('benchPress')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex1">
+                        <label for="day1-ex1">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">2. Bent Over Barbell Row</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 8-10 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Hinge at hips, keep back straight, pull to lower chest</div>
+                    <button class="demo-btn" onclick="showDemo('bentOverRow')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex2">
+                        <label for="day1-ex2">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">3. Overhead Press (Dumbbell or Barbell)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Press straight up, keep core tight, don't arch back excessively</div>
+                    <button class="demo-btn" onclick="showDemo('overheadPress')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex3">
+                        <label for="day1-ex3">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">4. Lat Pulldown</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Pull bar to upper chest, squeeze shoulder blades together</div>
+                    <button class="demo-btn" onclick="showDemo('latPulldown')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex4">
+                        <label for="day1-ex4">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">5. Dumbbell Bicep Curls</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Keep elbows stationary, control the weight down</div>
+                    <button class="demo-btn" onclick="showDemo('bicepCurl')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex5">
+                        <label for="day1-ex5">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">6. Tricep Pushdowns (Cable)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Keep elbows tucked, fully extend arms</div>
+                    <button class="demo-btn" onclick="showDemo('tricepPushdown')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day1-ex6">
+                        <label for="day1-ex6">Completed</label>
+                    </div>
+                </div>
+
+                <div class="section-title">Cool Down</div>
+                <div class="exercise">
+                    <div class="exercise-name">Stretching</div>
+                    <div class="exercise-details">5 minutes - chest, shoulders, arms</div>
+                </div>
+
+                <div class="progress-section">
+                    <button class="reset-btn" onclick="resetDay('day1')">Reset Day 1</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 2: Lower Body A -->
+        <div id="day2" class="workout-content hidden">
+            <div class="workout-card">
+                <div class="workout-title">Day 2: Lower Body A</div>
+                
+                <div class="info-box">
+                    <strong>⏱️ Duration:</strong> 45-60 minutes<br>
+                    <strong>🎯 Focus:</strong> Legs, Glutes, Core
+                </div>
+
+                <div class="section-title">Warm-up (5-10 min)</div>
+                <div class="exercise">
+                    <div class="exercise-name">Light Cardio + Leg Swings</div>
+                    <div class="exercise-details">5 minutes bike/walking + leg mobility</div>
+                </div>
+
+                <div class="section-title">Main Workout</div>
+                
+                <div class="exercise">
+                    <div class="exercise-name">1. Barbell Back Squat</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 4 | <strong>Reps:</strong> 8-10 | <strong>Rest:</strong> 2 min</div>
+                    <div class="form-tip">💡 Feet shoulder-width, squat to parallel, knees track over toes</div>
+                    <button class="demo-btn" onclick="showDemo('backSquat')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex1">
+                        <label for="day2-ex1">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">2. Romanian Deadlift</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Slight knee bend, hinge at hips, feel hamstring stretch</div>
+                    <button class="demo-btn" onclick="showDemo('romanianDeadlift')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex2">
+                        <label for="day2-ex2">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">3. Leg Press</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Feet hip-width, push through heels, don't lock knees</div>
+                    <button class="demo-btn" onclick="showDemo('legPress')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex3">
+                        <label for="day2-ex3">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">4. Leg Curl (Lying or Seated)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Control the weight, squeeze hamstrings at top</div>
+                    <button class="demo-btn" onclick="showDemo('legCurl')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex4">
+                        <label for="day2-ex4">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">5. Calf Raises (Standing)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 4 | <strong>Reps:</strong> 15-20 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Full range of motion, pause at top</div>
+                    <button class="demo-btn" onclick="showDemo('calfRaise')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex5">
+                        <label for="day2-ex5">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">6. Plank</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Duration:</strong> 30-60 sec | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Keep body straight, don't let hips sag</div>
+                    <button class="demo-btn" onclick="showDemo('plank')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day2-ex6">
+                        <label for="day2-ex6">Completed</label>
+                    </div>
+                </div>
+
+                <div class="section-title">Cool Down</div>
+                <div class="exercise">
+                    <div class="exercise-name">Stretching</div>
+                    <div class="exercise-details">5 minutes - quads, hamstrings, calves, glutes</div>
+                </div>
+
+                <div class="progress-section">
+                    <button class="reset-btn" onclick="resetDay('day2')">Reset Day 2</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 3: Upper Body B -->
+        <div id="day3" class="workout-content hidden">
+            <div class="workout-card">
+                <div class="workout-title">Day 3: Upper Body B</div>
+                
+                <div class="info-box">
+                    <strong>⏱️ Duration:</strong> 45-60 minutes<br>
+                    <strong>🎯 Focus:</strong> Chest, Back, Arms (Different angles)
+                </div>
+
+                <div class="section-title">Warm-up (5-10 min)</div>
+                <div class="exercise">
+                    <div class="exercise-name">Light Cardio + Dynamic Stretches</div>
+                    <div class="exercise-details">5 minutes + shoulder mobility</div>
+                </div>
+
+                <div class="section-title">Main Workout</div>
+                
+                <div class="exercise">
+                    <div class="exercise-name">1. Incline Dumbbell Press</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 8-10 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 30-45° incline, lower to upper chest, press up and together</div>
+                    <button class="demo-btn" onclick="showDemo('inclinePress')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex1">
+                        <label for="day3-ex1">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">2. Cable Rows (Seated)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Sit upright, pull to lower chest, squeeze shoulder blades</div>
+                    <button class="demo-btn" onclick="showDemo('cableRow')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex2">
+                        <label for="day3-ex2">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">3. Dumbbell Lateral Raises</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Slight bend in elbows, raise to shoulder height, control descent</div>
+                    <button class="demo-btn" onclick="showDemo('lateralRaise')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex3">
+                        <label for="day3-ex3">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">4. Face Pulls (Cable)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Pull towards face, elbows high, squeeze rear delts</div>
+                    <button class="demo-btn" onclick="showDemo('facePull')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex4">
+                        <label for="day3-ex4">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">5. Hammer Curls</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Neutral grip (thumbs up), curl up, control down</div>
+                    <button class="demo-btn" onclick="showDemo('hammerCurl')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex5">
+                        <label for="day3-ex5">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">6. Overhead Tricep Extension (Dumbbell)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Keep elbows close to head, lower behind head, extend fully</div>
+                    <button class="demo-btn" onclick="showDemo('overheadTricep')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day3-ex6">
+                        <label for="day3-ex6">Completed</label>
+                    </div>
+                </div>
+
+                <div class="section-title">Cool Down</div>
+                <div class="exercise">
+                    <div class="exercise-name">Stretching</div>
+                    <div class="exercise-details">5 minutes - chest, back, shoulders, arms</div>
+                </div>
+
+                <div class="progress-section">
+                    <button class="reset-btn" onclick="resetDay('day3')">Reset Day 3</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 4: Lower Body B -->
+        <div id="day4" class="workout-content hidden">
+            <div class="workout-card">
+                <div class="workout-title">Day 4: Lower Body B</div>
+                
+                <div class="info-box">
+                    <strong>⏱️ Duration:</strong> 45-60 minutes<br>
+                    <strong>🎯 Focus:</strong> Legs, Glutes, Core (Different exercises)
+                </div>
+
+                <div class="section-title">Warm-up (5-10 min)</div>
+                <div class="exercise">
+                    <div class="exercise-name">Light Cardio + Hip Mobility</div>
+                    <div class="exercise-details">5 minutes + leg swings, hip circles</div>
+                </div>
+
+                <div class="section-title">Main Workout</div>
+                
+                <div class="exercise">
+                    <div class="exercise-name">1. Leg Press</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 4 | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 90 sec</div>
+                    <div class="form-tip">💡 Start heavier than Day 2, controlled reps</div>
+                    <button class="demo-btn" onclick="showDemo('legPress')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex1">
+                        <label for="day4-ex1">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">2. Bulgarian Split Squats</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 each leg | <strong>Reps:</strong> 10-12 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Back foot elevated, front knee tracks over toe, stay upright</div>
+                    <button class="demo-btn" onclick="showDemo('bulgarianSquat')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex2">
+                        <label for="day4-ex2">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">3. Leg Extensions</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Full extension, squeeze quads at top, controlled lowering</div>
+                    <button class="demo-btn" onclick="showDemo('legExtension')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex3">
+                        <label for="day4-ex3">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">4. Glute Bridges (Barbell or Dumbbell)</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 12-15 | <strong>Rest:</strong> 60 sec</div>
+                    <div class="form-tip">💡 Squeeze glutes at top, hold for 1 second</div>
+                    <button class="demo-btn" onclick="showDemo('gluteBridge')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex4">
+                        <label for="day4-ex4">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">5. Seated Calf Raises</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 4 | <strong>Reps:</strong> 15-20 | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Full stretch at bottom, full contraction at top</div>
+                    <button class="demo-btn" onclick="showDemo('seatedCalfRaise')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex5">
+                        <label for="day4-ex5">Completed</label>
+                    </div>
+                </div>
+
+                <div class="exercise">
+                    <div class="exercise-name">6. Russian Twists</div>
+                    <div class="exercise-details"><strong>Sets:</strong> 3 | <strong>Reps:</strong> 20 total (10 each side) | <strong>Rest:</strong> 45 sec</div>
+                    <div class="form-tip">💡 Lean back slightly, rotate torso, touch floor each side</div>
+                    <button class="demo-btn" onclick="showDemo('russianTwist')">📺 Watch Form Demo</button>
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox" id="day4-ex6">
+                        <label for="day4-ex6">Completed</label>
+                    </div>
+                </div>
+
+                <div class="section-title">Cool Down</div>
+                <div class="exercise">
+                    <div class="exercise-name">Stretching</div>
+                    <div class="exercise-details">5 minutes - full lower body, hip flexors</div>
+                </div>
+
+                <div class="progress-section">
+                    <button class="reset-btn" onclick="resetDay('day4')">Reset Day 4</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rest Timer -->
+        <div class="workout-card" style="margin-top: 20px;">
+            <div class="workout-title">Rest Timer</div>
+            <div id="timer" class="timer">00:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn" onclick="startTimer(45)">45s</button>
+                <button class="timer-btn" onclick="startTimer(60)">60s</button>
+                <button class="timer-btn" onclick="startTimer(90)">90s</button>
+                <button class="timer-btn" onclick="startTimer(120)">2min</button>
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn" onclick="stopTimer()">Stop</button>
+                <button class="timer-btn" onclick="resetTimer()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Program Guide -->
+        <div class="workout-card" style="margin-top: 20px;">
+            <div class="workout-title">📋 Program Guide</div>
+            
+            <div class="info-box">
+                <strong>Weekly Schedule Suggestion:</strong><br>
+                • Monday - Day 1 (Upper A)<br>
+                • Tuesday - Day 2 (Lower A)<br>
+                • Wednesday - REST<br>
+                • Thursday - Day 3 (Upper B)<br>
+                • Friday - Day 4 (Lower B)<br>
+                • Weekend - REST
+            </div>
+
+            <div class="section-title">Progression Plan</div>
+            <div class="exercise">
+                <div class="exercise-name">When to Increase Weight</div>
+                <div class="exercise-details">
+                    ✅ If you can complete all sets and reps with good form for 2 consecutive workouts<br>
+                    ✅ Increase weight by 5-10 lbs for compound movements (squats, bench, rows)<br>
+                    ✅ Increase by 2.5-5 lbs for isolation exercises (curls, raises)
+                </div>
+            </div>
+
+            <div class="section-title">Important Tips</div>
+            <div class="exercise">
+                <div class="exercise-details">
+                    💧 Drink water between sets<br>
+                    😤 Breathe: Exhale on exertion, inhale on release<br>
+                    📝 Track your weights each session<br>
+                    🍽️ Eat enough protein (0.7-1g per lb bodyweight)<br>
+                    😴 Get 7-9 hours of sleep<br>
+                    ⚠️ If something hurts (not burns), stop and reassess form
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div id="demoModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeDemo()">×</button>
+            <div id="demoContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let animationInterval;
+        let animationFrame = 0;
+
+        // Exercise database with detailed information
+        const exerciseDatabase = {
+            benchPress: {
+                name: "Bench Press",
+                primaryMuscles: ["Chest (Pectorals)", "Triceps"],
+                secondaryMuscles: ["Front Shoulders", "Core"],
+                steps: [
+                    "Lie flat on bench with feet planted on floor",
+                    "Grip bar slightly wider than shoulder-width",
+                    "Lower bar to mid-chest with controlled motion",
+                    "Press bar up explosively until arms are extended",
+                    "Keep shoulder blades squeezed together throughout"
+                ],
+                mistakes: [
+                    "Bouncing the bar off chest",
+                    "Lifting butt off the bench",
+                    "Flaring elbows too wide (>45°)",
+                    "Not using full range of motion"
+                ]
+            },
+            bentOverRow: {
+                name: "Bent Over Barbell Row",
+                primaryMuscles: ["Upper Back (Lats)", "Mid Back (Rhomboids)"],
+                secondaryMuscles: ["Biceps", "Rear Shoulders", "Lower Back"],
+                steps: [
+                    "Hinge at hips with slight knee bend, back straight",
+                    "Grip barbell with hands shoulder-width apart",
+                    "Pull bar to lower chest/upper abdomen",
+                    "Squeeze shoulder blades together at top",
+                    "Lower with control, maintain torso angle"
+                ],
+                mistakes: [
+                    "Rounding the back",
+                    "Standing too upright",
+                    "Using momentum/swinging",
+                    "Not squeezing at the top"
+                ]
+            },
+            overheadPress: {
+                name: "Overhead Press",
+                primaryMuscles: ["Shoulders (Deltoids)"],
+                secondaryMuscles: ["Triceps", "Upper Chest", "Core"],
+                steps: [
+                    "Stand with feet shoulder-width, core braced",
+                    "Start with bar at shoulder height",
+                    "Press bar straight up overhead",
+                    "Lock out arms at top without excessive back arch",
+                    "Lower with control back to shoulders"
+                ],
+                mistakes: [
+                    "Excessive lower back arching",
+                    "Pressing bar forward instead of up",
+                    "Not fully locking out at top",
+                    "Using legs to drive the weight (unless doing push press)"
+                ]
+            },
+            latPulldown: {
+                name: "Lat Pulldown",
+                primaryMuscles: ["Lats (Back Wings)", "Upper Back"],
+                secondaryMuscles: ["Biceps", "Rear Shoulders"],
+                steps: [
+                    "Sit with knees secured under pad",
+                    "Grip bar slightly wider than shoulder-width",
+                    "Pull bar down to upper chest",
+                    "Lean back slightly (10-15°)",
+                    "Squeeze shoulder blades, then extend arms fully"
+                ],
+                mistakes: [
+                    "Pulling behind neck (can strain shoulders)",
+                    "Using excessive momentum",
+                    "Leaning back too far",
+                    "Not controlling the eccentric (up) phase"
+                ]
+            },
+            bicepCurl: {
+                name: "Dumbbell Bicep Curl",
+                primaryMuscles: ["Biceps"],
+                secondaryMuscles: ["Forearms"],
+                steps: [
+                    "Stand with dumbbells at sides, palms forward",
+                    "Keep elbows locked at your sides",
+                    "Curl weights up toward shoulders",
+                    "Squeeze biceps at top for 1 second",
+                    "Lower slowly with control"
+                ],
+                mistakes: [
+                    "Swinging weights using momentum",
+                    "Moving elbows forward/backward",
+                    "Not fully extending arms at bottom",
+                    "Going too fast on the lowering phase"
+                ]
+            },
+            tricepPushdown: {
+                name: "Tricep Pushdown",
+                primaryMuscles: ["Triceps"],
+                secondaryMuscles: ["Forearms"],
+                steps: [
+                    "Stand facing cable machine",
+                    "Grip bar with elbows tucked at sides",
+                    "Push bar down until arms fully extended",
+                    "Squeeze triceps at bottom",
+                    "Return to start with control"
+                ],
+                mistakes: [
+                    "Letting elbows flare out",
+                    "Leaning forward too much",
+                    "Not fully extending arms",
+                    "Using shoulders instead of triceps"
+                ]
+            },
+            backSquat: {
+                name: "Barbell Back Squat",
+                primaryMuscles: ["Quadriceps", "Glutes"],
+                secondaryMuscles: ["Hamstrings", "Core", "Lower Back"],
+                steps: [
+                    "Bar rests on upper back/traps, not neck",
+                    "Feet shoulder-width, toes slightly out",
+                    "Descend by pushing hips back and bending knees",
+                    "Go to parallel (thighs parallel to floor)",
+                    "Drive through heels to stand back up"
+                ],
+                mistakes: [
+                    "Knees caving inward",
+                    "Rising on toes",
+                    "Rounding lower back",
+                    "Not squatting deep enough",
+                    "Looking down (keep neutral neck)"
+                ]
+            },
+            romanianDeadlift: {
+                name: "Romanian Deadlift",
+                primaryMuscles: ["Hamstrings", "Glutes"],
+                secondaryMuscles: ["Lower Back", "Forearms"],
+                steps: [
+                    "Start standing with bar at hip level",
+                    "Slight bend in knees (maintain throughout)",
+                    "Hinge at hips, push butt back",
+                    "Lower bar along thighs/shins while maintaining back straight",
+                    "Feel stretch in hamstrings, then drive hips forward to return"
+                ],
+                mistakes: [
+                    "Rounding the back",
+                    "Bending knees too much (becomes a squat)",
+                    "Not pushing hips back",
+                    "Going too low without hamstring flexibility"
+                ]
+            },
+            legPress: {
+                name: "Leg Press",
+                primaryMuscles: ["Quadriceps", "Glutes"],
+                secondaryMuscles: ["Hamstrings", "Calves"],
+                steps: [
+                    "Sit with back flat against pad",
+                    "Feet hip to shoulder-width on platform",
+                    "Lower platform until knees at 90° or slightly deeper",
+                    "Push through heels to extend legs",
+                    "Don't lock knees at top"
+                ],
+                mistakes: [
+                    "Locking knees completely",
+                    "Letting lower back lift off pad",
+                    "Feet placement too narrow or wide",
+                    "Bouncing at the bottom"
+                ]
+            },
+            legCurl: {
+                name: "Leg Curl",
+                primaryMuscles: ["Hamstrings"],
+                secondaryMuscles: ["Calves"],
+                steps: [
+                    "Lie face down on machine (or sit if seated version)",
+                    "Adjust pad to hit just above heels",
+                    "Curl legs up toward glutes",
+                    "Squeeze hamstrings at top",
+                    "Lower with control, don't let weight slam"
+                ],
+                mistakes: [
+                    "Lifting hips off pad",
+                    "Using too much momentum",
+                    "Not controlling the descent",
+                    "Partial range of motion"
+                ]
+            },
+            calfRaise: {
+                name: "Standing Calf Raise",
+                primaryMuscles: ["Calves (Gastrocnemius)"],
+                secondaryMuscles: ["Soleus"],
+                steps: [
+                    "Stand on edge of platform, balls of feet on edge",
+                    "Lower heels below platform level (stretch)",
+                    "Rise up onto toes as high as possible",
+                    "Hold peak contraction for 1 second",
+                    "Lower slowly back to stretch position"
+                ],
+                mistakes: [
+                    "Bouncing instead of controlled reps",
+                    "Not using full range of motion",
+                    "Bending knees (shifts to soleus)",
+                    "Going too fast"
+                ]
+            },
+            plank: {
+                name: "Plank",
+                primaryMuscles: ["Core (Abs)", "Deep Core (Transverse Abdominis)"],
+                secondaryMuscles: ["Shoulders", "Glutes", "Lower Back"],
+                steps: [
+                    "Start in forearm position, elbows under shoulders",
+                    "Body forms straight line from head to heels",
+                    "Engage core by pulling belly button to spine",
+                    "Squeeze glutes to prevent sagging hips",
+                    "Hold position while breathing normally"
+                ],
+                mistakes: [
+                    "Hips sagging toward floor",
+                    "Hips too high (pike position)",
+                    "Holding breath",
+                    "Looking up (keep neck neutral)"
+                ]
+            },
+            inclinePress: {
+                name: "Incline Dumbbell Press",
+                primaryMuscles: ["Upper Chest", "Front Shoulders"],
+                secondaryMuscles: ["Triceps", "Core"],
+                steps: [
+                    "Set bench to 30-45° incline",
+                    "Start with dumbbells at chest level",
+                    "Press weights up and slightly together",
+                    "Lower with control to upper chest",
+                    "Keep shoulder blades squeezed to bench"
+                ],
+                mistakes: [
+                    "Incline too steep (becomes shoulder press)",
+                    "Bouncing dumbbells off chest",
+                    "Not touching dumbbells together at top",
+                    "Arching back excessively"
+                ]
+            },
+            cableRow: {
+                name: "Seated Cable Row",
+                primaryMuscles: ["Mid Back", "Lats"],
+                secondaryMuscles: ["Biceps", "Rear Shoulders"],
+                steps: [
+                    "Sit with feet braced, slight knee bend",
+                    "Grip handle with arms extended",
+                    "Sit upright, maintain slight arch in lower back",
+                    "Pull handle to lower chest/upper abdomen",
+                    "Squeeze shoulder blades, then extend arms"
+                ],
+                mistakes: [
+                    "Rounding back",
+                    "Using legs to drive movement",
+                    "Pulling too high or too low",
+                    "Excessive torso movement"
+                ]
+            },
+            lateralRaise: {
+                name: "Dumbbell Lateral Raise",
+                primaryMuscles: ["Side Shoulders (Medial Deltoids)"],
+                secondaryMuscles: ["Front Shoulders", "Traps"],
+                steps: [
+                    "Stand with dumbbells at sides",
+                    "Slight bend in elbows (maintain throughout)",
+                    "Raise arms out to sides to shoulder height",
+                    "Lead with elbows, not hands",
+                    "Lower slowly and controlled"
+                ],
+                mistakes: [
+                    "Using momentum/swinging",
+                    "Raising above shoulder height (recruits traps)",
+                    "Shrugging shoulders",
+                    "Going too heavy"
+                ]
+            },
+            facePull: {
+                name: "Face Pull",
+                primaryMuscles: ["Rear Shoulders", "Upper Back"],
+                secondaryMuscles: ["Traps", "Rotator Cuff"],
+                steps: [
+                    "Set cable at upper chest height",
+                    "Grip rope with palms facing each other",
+                    "Pull rope towards face, elbows high",
+                    "Separate rope ends past your head",
+                    "Squeeze shoulder blades together"
+                ],
+                mistakes: [
+                    "Pulling too low (to chest instead of face)",
+                    "Keeping elbows low",
+                    "Using too much weight",
+                    "Not externally rotating shoulders"
+                ]
+            },
+            hammerCurl: {
+                name: "Hammer Curl",
+                primaryMuscles: ["Biceps", "Brachialis"],
+                secondaryMuscles: ["Forearms"],
+                steps: [
+                    "Hold dumbbells with neutral grip (thumbs up)",
+                    "Keep elbows locked at sides",
+                    "Curl weights up toward shoulders",
+                    "Maintain neutral grip throughout",
+                    "Lower with control"
+                ],
+                mistakes: [
+                    "Rotating wrists during movement",
+                    "Swinging weights",
+                    "Moving elbows",
+                    "Incomplete range of motion"
+                ]
+            },
+            overheadTricep: {
+                name: "Overhead Tricep Extension",
+                primaryMuscles: ["Triceps (Long Head)"],
+                secondaryMuscles: ["Core"],
+                steps: [
+                    "Hold dumbbell overhead with both hands",
+                    "Keep elbows close to head, pointing forward",
+                    "Lower weight behind head",
+                    "Feel stretch in triceps",
+                    "Extend arms back to start"
+                ],
+                mistakes: [
+                    "Letting elbows flare out",
+                    "Arching lower back",
+                    "Not going deep enough for stretch",
+                    "Using too much weight"
+                ]
+            },
+            bulgarianSquat: {
+                name: "Bulgarian Split Squat",
+                primaryMuscles: ["Quadriceps", "Glutes"],
+                secondaryMuscles: ["Hamstrings", "Core", "Stabilizers"],
+                steps: [
+                    "Place rear foot on bench behind you",
+                    "Front foot forward in lunge position",
+                    "Keep torso upright, core engaged",
+                    "Lower down until front thigh is parallel",
+                    "Drive through front heel to return"
+                ],
+                mistakes: [
+                    "Front knee going past toes excessively",
+                    "Leaning too far forward",
+                    "Rear foot too close to front foot",
+                    "Not going deep enough"
+                ]
+            },
+            legExtension: {
+                name: "Leg Extension",
+                primaryMuscles: ["Quadriceps"],
+                secondaryMuscles: [],
+                steps: [
+                    "Sit with back against pad",
+                    "Adjust pad to hit just above ankles",
+                    "Extend legs until fully straight",
+                    "Squeeze quads hard at top",
+                    "Lower slowly with control"
+                ],
+                mistakes: [
+                    "Bouncing at top or bottom",
+                    "Not fully extending",
+                    "Lifting butt off seat",
+                    "Going too fast"
+                ]
+            },
+            gluteBridge: {
+                name: "Glute Bridge",
+                primaryMuscles: ["Glutes", "Hamstrings"],
+                secondaryMuscles: ["Core", "Lower Back"],
+                steps: [
+                    "Lie on back, knees bent, feet flat",
+                    "Place weight across hips if using resistance",
+                    "Drive through heels, lift hips up",
+                    "Squeeze glutes hard at top for 1-2 seconds",
+                    "Lower hips back down with control"
+                ],
+                mistakes: [
+                    "Overarching lower back",
+                    "Not squeezing glutes",
+                    "Pushing through toes instead of heels",
+                    "Not achieving full hip extension"
+                ]
+            },
+            seatedCalfRaise: {
+                name: "Seated Calf Raise",
+                primaryMuscles: ["Soleus (Lower Calf)"],
+                secondaryMuscles: ["Gastrocnemius"],
+                steps: [
+                    "Sit with balls of feet on platform",
+                    "Place weight on knees",
+                    "Lower heels below platform (stretch)",
+                    "Raise heels as high as possible",
+                    "Pause at top, lower slowly"
+                ],
+                mistakes: [
+                    "Bouncing reps",
+                    "Not using full range",
+                    "Going too fast",
+                    "Letting knees rise off pad"
+                ]
+            },
+            russianTwist: {
+                name: "Russian Twist",
+                primaryMuscles: ["Obliques", "Core"],
+                secondaryMuscles: ["Hip Flexors"],
+                steps: [
+                    "Sit on floor, lean back 45°",
+                    "Lift feet off ground (or keep on floor for easier)",
+                    "Hold weight at chest",
+                    "Rotate torso side to side",
+                    "Touch weight/hands to floor each side"
+                ],
+                mistakes: [
+                    "Only moving arms, not torso",
+                    "Going too fast",
+                    "Rounding back excessively",
+                    "Not controlling the movement"
+                ]
+            }
+        };
+
+        function showDemo(exerciseKey) {
+            const exercise = exerciseDatabase[exerciseKey];
+            if (!exercise) {
+                console.error('Exercise not found:', exerciseKey);
+                return;
+            }
+
+            const modal = document.getElementById('demoModal');
+            const content = document.getElementById('demoContent');
+
+            content.innerHTML = `
+                <button class="close-btn" onclick="closeDemo()">×</button>
+                <div class="demo-title">${exercise.name}</div>
+                
+                <div class="demo-canvas">
+                    <canvas id="exerciseCanvas"></canvas>
+                </div>
+
+                <div class="animation-controls">
+                    <button class="anim-btn" onclick="playAnimation('${exerciseKey}')">▶ Play</button>
+                    <button class="anim-btn" onclick="pauseAnimation()">⏸ Pause</button>
+                    <button class="anim-btn" onclick="resetAnimation('${exerciseKey}')">↻ Reset</button>
+                </div>
+
+                <div class="muscle-diagram">
+                    <div style="width: 100%; margin-bottom: 10px;">
+                        <strong style="color: #667eea;">💪 Primary Muscles:</strong>
+                    </div>
+                    ${exercise.primaryMuscles.map(m => `<span class="muscle-tag primary">${m}</span>`).join('')}
+                </div>
+
+                <div class="muscle-diagram">
+                    <div style="width: 100%; margin-bottom: 10px;">
+                        <strong style="color: #1976d2;">🎯 Secondary Muscles:</strong>
+                    </div>
+                    ${exercise.secondaryMuscles.map(m => `<span class="muscle-tag">${m}</span>`).join('')}
+                </div>
+
+                <div class="form-steps">
+                    <h4>✅ Proper Form Steps:</h4>
+                    <ol>
+                        ${exercise.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+
+                <div class="common-mistakes">
+                    <h4>⚠️ Common Mistakes to Avoid:</h4>
+                    <ul>
+                        ${exercise.mistakes.map(mistake => `<li>${mistake}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            modal.classList.add('active');
+            
+            // Wait for DOM to update, then initialize canvas
+            setTimeout(() => {
+                const canvas = document.getElementById('exerciseCanvas');
+                if (canvas) {
+                    drawExercise(exerciseKey, 0);
+                    // Auto-play animation
+                    playAnimation(exerciseKey);
+                } else {
+                    console.error('Canvas not found after modal opened');
+                }
+            }, 100);
+        }
+
+        function closeDemo() {
+            pauseAnimation();
+            document.getElementById('demoModal').classList.remove('active');
+        }
+
+        function playAnimation(exerciseKey) {
+            pauseAnimation();
+            animationFrame = 0;
+            animationInterval = setInterval(() => {
+                animationFrame++;
+                drawExercise(exerciseKey, animationFrame);
+            }, 50);
+        }
+
+        function pauseAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+        }
+
+        function resetAnimation(exerciseKey) {
+            pauseAnimation();
+            animationFrame = 0;
+            drawExercise(exerciseKey, 0);
+        }
+
+        function drawExercise(exerciseKey, frame) {
+            const canvas = document.getElementById('exerciseCanvas');
+            if (!canvas) return;
+            
+            // Make canvas responsive
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // Calculate animation progress (0 to 1 and back)
+            const cycle = 60; // frames per full cycle
+            const progress = frame % cycle;
+            const t = progress < cycle/2 ? progress / (cycle/2) : 2 - (progress / (cycle/2));
+
+            // Draw based on exercise type
+            switch(exerciseKey) {
+                case 'benchPress':
+                    drawBenchPress(ctx, t);
+                    break;
+                case 'bentOverRow':
+                    drawBentOverRow(ctx, t);
+                    break;
+                case 'overheadPress':
+                    drawOverheadPress(ctx, t);
+                    break;
+                case 'latPulldown':
+                    drawLatPulldown(ctx, t);
+                    break;
+                case 'bicepCurl':
+                    drawBicepCurl(ctx, t);
+                    break;
+                case 'tricepPushdown':
+                    drawTricepPushdown(ctx, t);
+                    break;
+                case 'backSquat':
+                    drawBackSquat(ctx, t);
+                    break;
+                case 'romanianDeadlift':
+                    drawRomanianDeadlift(ctx, t);
+                    break;
+                case 'legPress':
+                    drawLegPress(ctx, t);
+                    break;
+                case 'legCurl':
+                    drawLegCurl(ctx, t);
+                    break;
+                case 'calfRaise':
+                    drawCalfRaise(ctx, t);
+                    break;
+                case 'plank':
+                    drawPlank(ctx, t);
+                    break;
+                case 'inclinePress':
+                    drawInclinePress(ctx, t);
+                    break;
+                case 'cableRow':
+                    drawCableRow(ctx, t);
+                    break;
+                case 'lateralRaise':
+                    drawLateralRaise(ctx, t);
+                    break;
+                case 'facePull':
+                    drawFacePull(ctx, t);
+                    break;
+                case 'hammerCurl':
+                    drawHammerCurl(ctx, t);
+                    break;
+                case 'overheadTricep':
+                    drawOverheadTricep(ctx, t);
+                    break;
+                case 'bulgarianSquat':
+                    drawBulgarianSquat(ctx, t);
+                    break;
+                case 'legExtension':
+                    drawLegExtension(ctx, t);
+                    break;
+                case 'gluteBridge':
+                    drawGluteBridge(ctx, t);
+                    break;
+                case 'seatedCalfRaise':
+                    drawSeatedCalfRaise(ctx, t);
+                    break;
+                case 'russianTwist':
+                    drawRussianTwist(ctx, t);
+                    break;
+            }
+        }
+
+        // Drawing functions for each exercise
+        function drawBenchPress(ctx, t) {
+            const centerX = 200, benchY = 200;
+            
+            // Bench
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(100, benchY, 200, 15);
+            
+            // Person lying on bench
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX, benchY - 20, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.stroke();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(centerX, benchY - 5);
+            ctx.lineTo(centerX, benchY + 60);
+            ctx.stroke();
+            
+            // Barbell position varies with t
+            const barY = benchY - 40 - (t * 50);
+            
+            // Bar
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 80, barY);
+            ctx.lineTo(centerX + 80, barY);
+            ctx.stroke();
+            
+            // Weights
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 85, barY - 10, 10, 20);
+            ctx.fillRect(centerX + 75, barY - 10, 10, 20);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            const armAngle = Math.PI/2 - (t * Math.PI/6);
+            
+            // Left arm
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, benchY + 10);
+            ctx.lineTo(centerX - 20 + Math.cos(armAngle) * 40, benchY + 10 - Math.sin(armAngle) * 40);
+            ctx.lineTo(centerX - 70, barY);
+            ctx.stroke();
+            
+            // Right arm
+            ctx.beginPath();
+            ctx.moveTo(centerX + 20, benchY + 10);
+            ctx.lineTo(centerX + 20 + Math.cos(Math.PI - armAngle) * 40, benchY + 10 - Math.sin(Math.PI - armAngle) * 40);
+            ctx.lineTo(centerX + 70, barY);
+            ctx.stroke();
+            
+            // Highlight muscles
+            highlightMuscle(ctx, centerX - 15, benchY + 20, 'Chest', '#FF6B6B');
+            highlightMuscle(ctx, centerX - 50, barY + 20, 'Triceps', '#4ECDC4');
+        }
+
+        function drawBentOverRow(ctx, t) {
+            const centerX = 200, baseY = 220;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, baseY + 30);
+            ctx.lineTo(350, baseY + 30);
+            ctx.stroke();
+            
+            // Person in bent position
+            const hipX = centerX, hipY = baseY - 40;
+            const headX = centerX - 60, headY = baseY - 80;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(headX, headY, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(headX, headY + 15);
+            ctx.lineTo(hipX, hipY);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(hipX, hipY);
+            ctx.lineTo(hipX + 20, baseY + 30);
+            ctx.stroke();
+            
+            // Barbell movement
+            const barY = baseY - 20 - (t * 50);
+            const barX = centerX - 40;
+            
+            // Bar
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(barX - 60, barY);
+            ctx.lineTo(barX + 60, barY);
+            ctx.stroke();
+            
+            // Weights
+            ctx.fillStyle = '#333';
+            ctx.fillRect(barX - 65, barY - 8, 10, 16);
+            ctx.fillRect(barX + 55, barY - 8, 10, 16);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            
+            // Arms pulling bar
+            ctx.beginPath();
+            ctx.moveTo(headX + 40, headY + 30);
+            ctx.lineTo(barX, barY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, headX + 20, headY + 40, 'Back', '#4ECDC4');
+            highlightMuscle(ctx, barX - 20, barY - 15, 'Lats', '#FF6B6B');
+        }
+
+        function drawOverheadPress(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, baseY);
+            ctx.lineTo(350, baseY);
+            ctx.stroke();
+            
+            // Legs
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, baseY);
+            ctx.lineTo(centerX - 15, baseY - 80);
+            ctx.moveTo(centerX + 15, baseY);
+            ctx.lineTo(centerX + 15, baseY - 80);
+            ctx.stroke();
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(centerX, baseY - 80);
+            ctx.lineTo(centerX, baseY - 140);
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX, baseY - 155, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Barbell height varies
+            const barY = baseY - 140 - (t * 40);
+            
+            // Bar
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 60, barY);
+            ctx.lineTo(centerX + 60, barY);
+            ctx.stroke();
+            
+            // Weights
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 65, barY - 8, 10, 16);
+            ctx.fillRect(centerX + 55, barY - 8, 10, 16);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            const elbowY = baseY - 120 + (t * 20);
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, baseY - 130);
+            ctx.lineTo(centerX - 50, elbowY);
+            ctx.lineTo(centerX - 50, barY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX + 20, baseY - 130);
+            ctx.lineTo(centerX + 50, elbowY);
+            ctx.lineTo(centerX + 50, barY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX - 35, baseY - 125, 'Shoulders', '#FF6B6B');
+        }
+
+        function drawLatPulldown(ctx, t) {
+            const centerX = 200;
+            
+            // Machine frame
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 80, 40);
+            ctx.lineTo(centerX + 80, 40);
+            ctx.stroke();
+            
+            // Seat
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(centerX - 40, 200, 80, 15);
+            
+            // Person sitting
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, 215);
+            ctx.lineTo(centerX - 15, 260);
+            ctx.moveTo(centerX + 15, 215);
+            ctx.lineTo(centerX + 15, 260);
+            ctx.stroke();
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(centerX, 200);
+            ctx.lineTo(centerX, 140);
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX, 125, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Bar height varies
+            const barY = 60 + (t * 60);
+            
+            // Cable and bar
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 40);
+            ctx.lineTo(centerX, barY);
+            ctx.stroke();
+            
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 60, barY);
+            ctx.lineTo(centerX + 60, barY);
+            ctx.stroke();
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            
+            const shoulderY = 150;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, shoulderY);
+            ctx.lineTo(centerX - 50, barY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX + 20, shoulderY);
+            ctx.lineTo(centerX + 50, barY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX - 25, 170, 'Lats', '#FF6B6B');
+        }
+
+        function drawBicepCurl(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, baseY);
+            ctx.lineTo(350, baseY);
+            ctx.stroke();
+            
+            // Person standing
+            drawStandingFigure(ctx, centerX, baseY);
+            
+            // Dumbbells
+            const dbY = baseY - 120 - (t * 40);
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 70, dbY - 8, 20, 16);
+            ctx.fillRect(centerX + 50, dbY - 8, 20, 16);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            
+            const elbowY = baseY - 110;
+            const forearmAngle = -Math.PI/2 - (t * Math.PI/3);
+            
+            // Left arm
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, baseY - 130);
+            ctx.lineTo(centerX - 45, elbowY);
+            ctx.lineTo(centerX - 45 + Math.cos(forearmAngle) * 35, elbowY + Math.sin(forearmAngle) * 35);
+            ctx.stroke();
+            
+            // Right arm
+            ctx.beginPath();
+            ctx.moveTo(centerX + 20, baseY - 130);
+            ctx.lineTo(centerX + 45, elbowY);
+            ctx.lineTo(centerX + 45 + Math.cos(forearmAngle) * 35, elbowY + Math.sin(forearmAngle) * 35);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX - 45, elbowY - 20, 'Biceps', '#FF6B6B');
+        }
+
+        function drawTricepPushdown(ctx, t) {
+            const centerX = 200;
+            
+            // Cable machine top
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 80, 40);
+            ctx.lineTo(centerX + 80, 40);
+            ctx.stroke();
+            
+            // Person
+            drawStandingFigure(ctx, centerX, 250);
+            
+            // Bar position
+            const barY = 140 + (t * 40);
+            
+            // Cable
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 40);
+            ctx.lineTo(centerX, barY);
+            ctx.stroke();
+            
+            // Bar
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 30, barY);
+            ctx.lineTo(centerX + 30, barY);
+            ctx.stroke();
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            
+            const elbowY = 120;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, 110);
+            ctx.lineTo(centerX - 25, elbowY);
+            ctx.lineTo(centerX - 25, barY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX + 20, 110);
+            ctx.lineTo(centerX + 25, elbowY);
+            ctx.lineTo(centerX + 25, barY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX + 35, elbowY + 15, 'Triceps', '#FF6B6B');
+        }
+
+        function drawBackSquat(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, baseY);
+            ctx.lineTo(350, baseY);
+            ctx.stroke();
+            
+            // Barbell on shoulders
+            const shoulderY = 100 + (t * 50);
+            const barY = shoulderY - 10;
+            
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 80, barY);
+            ctx.lineTo(centerX + 80, barY);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 85, barY - 10, 10, 20);
+            ctx.fillRect(centerX + 75, barY - 10, 10, 20);
+            
+            // Person squatting
+            const hipY = shoulderY + 40;
+            const kneeY = hipY + 40 - (t * 20);
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX, shoulderY - 25, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX, shoulderY);
+            ctx.lineTo(centerX, hipY);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, hipY);
+            ctx.lineTo(centerX - 15, kneeY);
+            ctx.lineTo(centerX - 25, baseY);
+            ctx.moveTo(centerX + 15, hipY);
+            ctx.lineTo(centerX + 15, kneeY);
+            ctx.lineTo(centerX + 25, baseY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX - 20, kneeY - 20, 'Quads', '#FF6B6B');
+            highlightMuscle(ctx, centerX + 20, hipY + 10, 'Glutes', '#4ECDC4');
+        }
+
+        function drawRomanianDeadlift(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, baseY);
+            ctx.lineTo(350, baseY);
+            ctx.stroke();
+            
+            // Bar position
+            const barY = baseY - 20 - (t * 60);
+            const hipX = centerX + (t * 20);
+            
+            // Barbell
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 60, barY);
+            ctx.lineTo(centerX + 60, barY);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 65, barY - 8, 10, 16);
+            ctx.fillRect(centerX + 55, barY - 8, 10, 16);
+            
+            // Person
+            const headX = centerX + (t * 40);
+            const headY = 80 + (t * 40);
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(headX, headY, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(headX, headY + 15);
+            ctx.lineTo(hipX, 160);
+            ctx.stroke();
+            
+            // Legs (slight bend)
+            ctx.beginPath();
+            ctx.moveTo(hipX - 15, 160);
+            ctx.lineTo(centerX - 20, baseY);
+            ctx.moveTo(hipX + 15, 160);
+            ctx.lineTo(centerX + 20, baseY);
+            ctx.stroke();
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(headX, headY + 30);
+            ctx.lineTo(centerX, barY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX, 200, 'Hamstrings', '#FF6B6B');
+        }
+
+        function drawLegPress(ctx, t) {
+            // Angled machine
+            const angle = Math.PI / 4;
+            
+            // Platform
+            ctx.save();
+            ctx.translate(200, 150);
+            ctx.rotate(-angle);
+            
+            const platformX = -60 + (t * 40);
+            
+            ctx.fillStyle = '#666';
+            ctx.fillRect(platformX, -50, 120, 100);
+            
+            // Person lying
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(-100, 0);
+            ctx.lineTo(-180, 0);
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(-195, 0, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Legs
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            const kneeX = -100 + (t * 30);
+            
+            ctx.beginPath();
+            ctx.moveTo(-100, -15);
+            ctx.lineTo(kneeX, -15);
+            ctx.lineTo(platformX - 20, -15);
+            ctx.moveTo(-100, 15);
+            ctx.lineTo(kneeX, 15);
+            ctx.lineTo(platformX - 20, 15);
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            highlightMuscle(ctx, 120, 120, 'Quads', '#FF6B6B');
+        }
+
+        function drawLegCurl(ctx, t) {
+            // Machine bench
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(80, 150, 240, 15);
+            
+            // Pad
+            const padAngle = t * Math.PI / 3;
+            const padX = 200;
+            const padY = 220 - (t * 30);
+            
+            ctx.save();
+            ctx.translate(padX, 220);
+            ctx.rotate(-padAngle);
+            ctx.fillStyle = '#666';
+            ctx.fillRect(-30, 0, 60, 15);
+            ctx.restore();
+            
+            // Person lying face down
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(120, 140, 12, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(120, 152);
+            ctx.lineTo(200, 157);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(200, 165);
+            ctx.lineTo(padX - 10, padY);
+            ctx.moveTo(200, 165);
+            ctx.lineTo(padX + 10, padY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, 220, 200, 'Hamstrings', '#FF6B6B');
+        }
+
+        function drawCalfRaise(ctx, t) {
+            const centerX = 200, baseY = 250;
+            const heelY = baseY - (t * 30);
+            
+            // Platform edge
+            ctx.fillStyle = '#666';
+            ctx.fillRect(150, baseY, 100, 10);
+            
+            // Person
+            drawStandingFigure(ctx, centerX, heelY);
+            
+            // Emphasize calf position
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, heelY - 30);
+            ctx.lineTo(centerX - 15, heelY);
+            ctx.moveTo(centerX + 15, heelY - 30);
+            ctx.lineTo(centerX + 15, heelY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX + 40, heelY - 20, 'Calves', '#FF6B6B');
+        }
+
+        function drawPlank(ctx, t) {
+            const centerX = 200;
+            const sag = Math.sin(t * Math.PI) * 15; // Slight movement for animation
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, 220);
+            ctx.lineTo(350, 220);
+            ctx.stroke();
+            
+            // Person in plank
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(120, 160 + sag, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Body
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(120, 175 + sag);
+            ctx.lineTo(centerX, 180 + sag);
+            ctx.lineTo(280, 185 + sag);
+            ctx.stroke();
+            
+            // Arms (forearms on ground)
+            ctx.beginPath();
+            ctx.moveTo(120, 175 + sag);
+            ctx.lineTo(100, 210);
+            ctx.moveTo(120, 175 + sag);
+            ctx.lineTo(140, 210);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(280, 185 + sag);
+            ctx.lineTo(270, 215);
+            ctx.moveTo(280, 185 + sag);
+            ctx.lineTo(290, 215);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX, 165 + sag, 'Core', '#FF6B6B');
+        }
+
+        function drawInclinePress(ctx, t) {
+            // Incline bench
+            ctx.save();
+            ctx.translate(200, 200);
+            ctx.rotate(-Math.PI / 6);
+            
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(-50, -20, 100, 15);
+            
+            // Person
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -5);
+            ctx.lineTo(0, 60);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(0, -20, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            // Dumbbells
+            const dbY = 150 - (t * 40);
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(140, dbY, 20, 16);
+            ctx.fillRect(240, dbY, 20, 16);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(180, 180);
+            ctx.lineTo(150, dbY + 8);
+            ctx.moveTo(220, 180);
+            ctx.lineTo(250, dbY + 8);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, 200, 195, 'Upper Chest', '#FF6B6B');
+        }
+
+        function drawCableRow(ctx, t) {
+            // Seated position
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(140, 200, 80, 15);
+            
+            // Person
+            const torsoX = 200 + (t * 15);
+            
+            drawSeatedFigure(ctx, 200, 215);
+            
+            // Cable and handle
+            const handleX = torsoX + 40 - (t * 60);
+            
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(50, 170);
+            ctx.lineTo(handleX, 170);
+            ctx.stroke();
+            
+            // Handle
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(handleX - 5, 160);
+            ctx.lineTo(handleX - 5, 180);
+            ctx.stroke();
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(torsoX - 15, 165);
+            ctx.lineTo(handleX, 170);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, torsoX - 35, 170, 'Mid Back', '#FF6B6B');
+        }
+
+        function drawLateralRaise(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            drawStandingFigure(ctx, centerX, baseY);
+            
+            // Dumbbells
+            const armAngle = t * Math.PI / 3;
+            const dbX1 = centerX - 50 - Math.sin(armAngle) * 40;
+            const dbY1 = baseY - 120 - Math.cos(armAngle) * 40;
+            const dbX2 = centerX + 50 + Math.sin(armAngle) * 40;
+            const dbY2 = baseY - 120 - Math.cos(armAngle) * 40;
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(dbX1 - 10, dbY1 - 8, 20, 16);
+            ctx.fillRect(dbX2 - 10, dbY2 - 8, 20, 16);
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20, baseY - 130);
+            ctx.lineTo(dbX1, dbY1);
+            ctx.moveTo(centerX + 20, baseY - 130);
+            ctx.lineTo(dbX2, dbY2);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX - 35, baseY - 135, 'Side Delts', '#FF6B6B');
+        }
+
+        function drawFacePull(ctx, t) {
+            // Cable machine
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(120, 100);
+            ctx.lineTo(280, 100);
+            ctx.stroke();
+            
+            drawStandingFigure(ctx, 200, 250);
+            
+            // Rope handles
+            const handleDist = 30 - (t * 20);
+            
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(200, 100);
+            ctx.lineTo(200 - handleDist, 130);
+            ctx.moveTo(200, 100);
+            ctx.lineTo(200 + handleDist, 130);
+            ctx.stroke();
+            
+            // Arms
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(180, 110);
+            ctx.lineTo(200 - handleDist, 130);
+            ctx.moveTo(220, 110);
+            ctx.lineTo(200 + handleDist, 130);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, 220, 105, 'Rear Delts', '#FF6B6B');
+        }
+
+        function drawHammerCurl(ctx, t) {
+            drawBicepCurl(ctx, t); // Similar to regular curl
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Neutral Grip', 140, 30);
+        }
+
+        function drawOverheadTricep(ctx, t) {
+            const centerX = 200;
+            
+            drawStandingFigure(ctx, centerX, 250);
+            
+            // Dumbbell behind head
+            const dbY = 80 + (t * 30);
+            
+            ctx.fillStyle = '#333';
+            ctx.fillRect(centerX - 10, dbY, 20, 16);
+            
+            // Arms overhead
+            ctx.strokeStyle = '#FFD4A3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, 110);
+            ctx.lineTo(centerX - 10, 70);
+            ctx.lineTo(centerX, dbY);
+            ctx.moveTo(centerX + 15, 110);
+            ctx.lineTo(centerX + 10, 70);
+            ctx.lineTo(centerX, dbY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX + 25, 90, 'Triceps', '#FF6B6B');
+        }
+
+        function drawBulgarianSquat(ctx, t) {
+            const centerX = 200, baseY = 250;
+            
+            // Rear bench
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(260, 180, 60, 15);
+            
+            // Person
+            const hipY = 140 + (t * 40);
+            const kneeY = hipY + 40;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX, hipY - 50, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX, hipY - 35);
+            ctx.lineTo(centerX, hipY);
+            ctx.stroke();
+            
+            // Front leg
+            ctx.beginPath();
+            ctx.moveTo(centerX, hipY);
+            ctx.lineTo(centerX, kneeY);
+            ctx.lineTo(centerX + 10, baseY);
+            ctx.stroke();
+            
+            // Rear leg on bench
+            ctx.beginPath();
+            ctx.moveTo(centerX, hipY);
+            ctx.lineTo(280, 180);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX + 15, kneeY - 15, 'Quads', '#FF6B6B');
+        }
+
+        function drawLegExtension(ctx, t) {
+            // Machine
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(140, 180, 80, 15);
+            
+            // Seated person
+            drawSeatedFigure(ctx, 200, 195);
+            
+            // Pad
+            const padAngle = -Math.PI/2 + (t * Math.PI/3);
+            const padDist = 50;
+            const padX = 200 + Math.cos(padAngle) * padDist;
+            const padY = 220 + Math.sin(padAngle) * padDist;
+            
+            ctx.save();
+            ctx.translate(padX, padY);
+            ctx.rotate(padAngle);
+            ctx.fillStyle = '#666';
+            ctx.fillRect(-25, -8, 50, 16);
+            ctx.restore();
+            
+            // Legs
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(190, 210);
+            ctx.lineTo(padX, padY);
+            ctx.moveTo(210, 210);
+            ctx.lineTo(padX, padY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, 210, 200, 'Quads', '#FF6B6B');
+        }
+
+        function drawGluteBridge(ctx, t) {
+            const centerX = 200;
+            const lift = t * 40;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, 230);
+            ctx.lineTo(350, 230);
+            ctx.stroke();
+            
+            // Person
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(centerX - 60, 210, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso (lifted)
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 60, 225);
+            ctx.lineTo(centerX, 180 - lift);
+            ctx.lineTo(centerX + 40, 210);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(centerX + 40, 210);
+            ctx.lineTo(centerX + 30, 230);
+            ctx.moveTo(centerX + 40, 210);
+            ctx.lineTo(centerX + 50, 230);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, centerX + 10, 185 - lift, 'Glutes', '#FF6B6B');
+        }
+
+        function drawSeatedCalfRaise(ctx, t) {
+            // Bench
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(140, 180, 120, 15);
+            
+            drawSeatedFigure(ctx, 200, 195);
+            
+            // Weight on knees
+            ctx.fillStyle = '#333';
+            ctx.fillRect(180, 200, 40, 20);
+            
+            // Feet/calves
+            const heelY = 250 - (t * 20);
+            
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(185, 220);
+            ctx.lineTo(185, heelY);
+            ctx.moveTo(215, 220);
+            ctx.lineTo(215, heelY);
+            ctx.stroke();
+            
+            highlightMuscle(ctx, 230, 235, 'Soleus', '#FF6B6B');
+        }
+
+        function drawRussianTwist(ctx, t) {
+            const centerX = 200;
+            const rotation = Math.sin(t * Math.PI * 2) * 30;
+            
+            // Floor
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, 220);
+            ctx.lineTo(350, 220);
+            ctx.stroke();
+            
+            ctx.save();
+            ctx.translate(centerX, 180);
+            ctx.rotate(rotation * Math.PI / 180);
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(0, -40, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Torso
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(0, -25);
+            ctx.lineTo(0, 20);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(0, 20);
+            ctx.lineTo(-20, 40);
+            ctx.moveTo(0, 20);
+            ctx.lineTo(20, 40);
+            ctx.stroke();
+            
+            // Weight
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-15, -10, 30, 20);
+            
+            ctx.restore();
+            
+            highlightMuscle(ctx, centerX - 40, 165, 'Obliques', '#FF6B6B');
+        }
+
+        // Helper functions
+        function drawStandingFigure(ctx, x, baseY) {
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(x - 15, baseY);
+            ctx.lineTo(x - 15, baseY - 80);
+            ctx.moveTo(x + 15, baseY);
+            ctx.lineTo(x + 15, baseY - 80);
+            ctx.stroke();
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(x, baseY - 80);
+            ctx.lineTo(x, baseY - 140);
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(x, baseY - 155, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function drawSeatedFigure(ctx, x, y) {
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            
+            // Torso
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y - 50);
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(x, y - 65, 15, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD4A3';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Legs
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y + 15);
+            ctx.lineTo(x - 10, y + 40);
+            ctx.moveTo(x + 10, y + 15);
+            ctx.lineTo(x + 10, y + 40);
+            ctx.stroke();
+        }
+
+        function highlightMuscle(ctx, x, y, label, color) {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 11px Arial';
+            ctx.fillText(label, x + 25, y + 5);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('demoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDemo();
+            }
+        });
+
+        let timeLeft = 0;
+
+        function showDay(day) {
+            // Hide all workout content
+            document.querySelectorAll('.workout-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected day
+            document.getElementById(day).classList.remove('hidden');
+
+            // Add active class to the correct button
+            const buttons = document.querySelectorAll('.day-btn');
+            const dayIndex = parseInt(day.replace('day', '')) - 1;
+            if (buttons[dayIndex]) {
+                buttons[dayIndex].classList.add('active');
+            }
+
+            // Save to localStorage
+            localStorage.setItem('currentDay', day);
+
+            // Load checkboxes for this day
+            loadCheckboxes(day);
+        }
+
+        function resetDay(day) {
+            if (confirm('Reset all exercises for this day?')) {
+                const checkboxes = document.querySelectorAll(`#${day} .checkbox`);
+                checkboxes.forEach(cb => {
+                    cb.checked = false;
+                });
+                saveCheckboxes(day);
+            }
+        }
+
+        function saveCheckboxes(day) {
+            const checkboxes = document.querySelectorAll(`#${day} .checkbox`);
+            const states = {};
+            checkboxes.forEach(cb => {
+                states[cb.id] = cb.checked;
+            });
+            localStorage.setItem(`${day}-checkboxes`, JSON.stringify(states));
+        }
+
+        function loadCheckboxes(day) {
+            const saved = localStorage.getItem(`${day}-checkboxes`);
+            if (saved) {
+                const states = JSON.parse(saved);
+                Object.keys(states).forEach(id => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) {
+                        checkbox.checked = states[id];
+                    }
+                });
+            }
+        }
+
+        // Save checkbox state when changed
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('checkbox')) {
+                const day = e.target.id.split('-')[0];
+                saveCheckboxes(day);
+            }
+        });
+
+        // Timer functions
+        function startTimer(seconds) {
+            stopTimer();
+            timeLeft = seconds;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            timeLeft = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Change color when time is running out
+            const timerEl = document.getElementById('timer');
+            if (timeLeft <= 10 && timeLeft > 0) {
+                timerEl.style.background = '#ff9800';
+            } else if (timeLeft === 0) {
+                timerEl.style.background = '#f44336';
+            } else {
+                timerEl.style.background = '#4caf50';
+            }
+        }
+
+        function playBeep() {
+            // Vibrate if available
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            alert('Rest time complete! 💪');
+        }
+
+        // Load last viewed day on page load
+        window.addEventListener('load', () => {
+            const lastDay = localStorage.getItem('currentDay') || 'day1';
+            showDay(lastDay);
+            
+            // Trigger click on the saved day button
+            const buttons = document.querySelectorAll('.day-btn');
+            buttons.forEach((btn, index) => {
+                const dayNum = `day${index + 1}`;
+                if (dayNum === lastDay) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
